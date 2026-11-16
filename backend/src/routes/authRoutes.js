@@ -6,7 +6,11 @@ const pool = require("../config/db");
 
 const router = express.Router();
 
-const FRONTEND_URL = "http://localhost:5173";
+// Automatically use the correct frontend URL in development and production.
+const FRONTEND_URL =
+  process.env.FRONTEND_URL ||
+  process.env.RENDER_EXTERNAL_URL ||
+  "http://localhost:5173";
 
 const DASHBOARD_ROUTES = {
   resident: "/resident",
@@ -207,7 +211,7 @@ router.post("/logout", (req, res, next) => {
       res.clearCookie("connect.sid", {
         httpOnly: true,
         sameSite: "lax",
-        secure: false,
+        secure: process.env.NODE_ENV === "production",
       });
 
       return res.status(200).json({

@@ -17,20 +17,19 @@ const notificationRoutes = require("./routes/notifications");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === "production";
 
-// Ensure the session secret exists.
 if (!process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET is missing.");
 }
 
-// Render runs behind a proxy. Required for secure production cookies.
-if (process.env.NODE_ENV === "production") {
+if (isProduction) {
   app.set("trust proxy", 1);
 }
 
-// CORS is only needed for local frontend development.
-// In production, React and the API use the same domain.
-if (process.env.NODE_ENV !== "production") {
+// Local development CORS only.
+// Production frontend and backend share the same origin.
+if (!isProduction) {
   app.use(
     cors({
       origin: "http://localhost:5173",
@@ -56,7 +55,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     },
@@ -75,7 +74,7 @@ app.use("/api/maintenance-requests", maintenanceRequestRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// Backend health check.
+// API health check.
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
@@ -105,13 +104,12 @@ app.get("/api/health/db", async (req, res) => {
   }
 });
 
-// Serve the built React frontend.
-// backend/src/server.js -> project-root/dist
+// Serve React frontend.
 const frontendPath = path.resolve(__dirname, "../../dist");
 
 app.use(express.static(frontendPath));
 
-// React Router fallback: serve index.html for frontend routes.
+// React Router fallback.
 app.get("/{*splat}", (req, res, next) => {
   if (req.path.startsWith("/api/")) {
     return next();

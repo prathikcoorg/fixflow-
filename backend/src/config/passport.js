@@ -6,20 +6,23 @@ const bcrypt = require("bcrypt");
 const pool = require("./db");
 
 function configureGoogleAuth(passport) {
+  const callbackURL =
+    process.env.GOOGLE_CALLBACK_URL ||
+    (process.env.NODE_ENV === "production"
+      ? `${process.env.RENDER_EXTERNAL_URL}/api/auth/google/callback`
+      : "http://localhost:5000/api/auth/google/callback");
+
   passport.use(
     new GoogleStrategy(
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL:
-          process.env.GOOGLE_CALLBACK_URL ||
-          "http://localhost:5000/api/auth/google/callback",
+        callbackURL,
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
           const email = profile.emails?.[0]?.value?.toLowerCase();
-          const fullName =
-            profile.displayName || "FixFlow User";
+          const fullName = profile.displayName || "FixFlow User";
 
           if (!email || profile.emails?.[0]?.verified === false) {
             return done(
@@ -27,7 +30,6 @@ function configureGoogleAuth(passport) {
             );
           }
 
-          // Reuse an existing account with this email.
           const existingUser = await pool.query(
             `SELECT id, organization_id, full_name, email, role
              FROM users
@@ -40,7 +42,6 @@ function configureGoogleAuth(passport) {
             return done(null, existingUser.rows[0]);
           }
 
-          // New Google accounts join the demo community.
           const organization = await pool.query(
             `SELECT id
              FROM organizations
@@ -55,8 +56,6 @@ function configureGoogleAuth(passport) {
             );
           }
 
-          // Google sign-in does not provide a password.
-          // Generate a random password hash that users cannot know.
           const randomPassword = crypto.randomBytes(48).toString("hex");
           const passwordHash = await bcrypt.hash(randomPassword, 12);
 
