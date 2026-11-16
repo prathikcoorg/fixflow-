@@ -6,11 +6,17 @@ const bcrypt = require("bcrypt");
 const pool = require("./db");
 
 function configureGoogleAuth(passport) {
-  const callbackURL =
-    process.env.GOOGLE_CALLBACK_URL ||
-    (process.env.NODE_ENV === "production"
-      ? `${process.env.RENDER_EXTERNAL_URL}/api/auth/google/callback`
-      : "http://localhost:5000/api/auth/google/callback");
+  // Use the production callback URL on Render.
+  // Use localhost only during local development.
+  const isProduction =
+    process.env.NODE_ENV === "production" ||
+    Boolean(process.env.RENDER_EXTERNAL_URL);
+
+  const callbackURL = isProduction
+    ? "https://fixora-lzci.onrender.com/api/auth/google/callback"
+    : "http://localhost:5000/api/auth/google/callback";
+
+  console.log("Google OAuth callback URL:", callbackURL);
 
   passport.use(
     new GoogleStrategy(
@@ -30,6 +36,7 @@ function configureGoogleAuth(passport) {
             );
           }
 
+          // Check whether the Google account already exists.
           const existingUser = await pool.query(
             `SELECT id, organization_id, full_name, email, role
              FROM users
@@ -42,6 +49,7 @@ function configureGoogleAuth(passport) {
             return done(null, existingUser.rows[0]);
           }
 
+          // Find the default FixFlow demo organization.
           const organization = await pool.query(
             `SELECT id
              FROM organizations
@@ -56,9 +64,11 @@ function configureGoogleAuth(passport) {
             );
           }
 
+          // Generate a random password for Google-only accounts.
           const randomPassword = crypto.randomBytes(48).toString("hex");
           const passwordHash = await bcrypt.hash(randomPassword, 12);
 
+          // Create a new resident account.
           const result = await pool.query(
             `INSERT INTO users
                (organization_id, full_name, email, password_hash, role)
@@ -75,16 +85,19 @@ function configureGoogleAuth(passport) {
 
           return done(null, result.rows[0]);
         } catch (error) {
+          console.error("Google authentication error:", error);
           return done(error);
         }
       }
     )
   );
 
+  // Serialize user into the session.
   passport.serializeUser((user, done) => {
     done(null, user.id);
   });
 
+  // Retrieve user from the session.
   passport.deserializeUser(async (id, done) => {
     try {
       const result = await pool.query(
@@ -98,9 +111,10 @@ function configureGoogleAuth(passport) {
         return done(null, false);
       }
 
-      done(null, result.rows[0]);
+      return done(null, result.rows[0]);
     } catch (error) {
-      done(error);
+      console.error("Session deserialization error:", error);
+      return done(error);
     }
   });
 }
