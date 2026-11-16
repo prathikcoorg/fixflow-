@@ -44,7 +44,7 @@ function DashboardPreview() {
     <div className="dashboard-window">
       <div className="window-topbar">
         <div className="window-dots"><span /><span /><span /></div>
-        <div className="window-address">app.fixflow.ai / overview</div>
+        <div className="window-address">app.fixflow / overview</div>
         <div className="window-avatar">F</div>
       </div>
 

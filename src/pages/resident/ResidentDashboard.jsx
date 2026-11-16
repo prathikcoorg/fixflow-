@@ -191,7 +191,7 @@ export default function ResidentDashboard() {
       setRequests(result.data);
     } catch (err) {
       if (err.name !== "AbortError") {
-        setError(err.message || "Could not connect to FixFlow AI.");
+        setError(err.message || "Could not connect to FixFlow.");
       }
     } finally {
       if (!signal?.aborted) {
@@ -974,7 +974,7 @@ export default function ResidentDashboard() {
               <h2>Something not working?</h2>
 
               <p>
-                Tell us what's wrong. FixFlow AI will help organize your report
+                Tell us what's wrong. FixFlow  will help organize your report
                 so the right team can review it.
               </p>
 

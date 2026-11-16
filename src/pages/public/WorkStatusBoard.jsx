@@ -16,7 +16,7 @@ import {
   Radio,
 } from "lucide-react";
 
-const API_URL = "http://localhost:5000/api/maintenance-requests";
+const API_URL = "";
 
 // Configure this in frontend/.env:
 // VITE_PUBLIC_ORGANIZATION_ID=1
@@ -525,7 +525,7 @@ function WorkStatusBoard() {
 
         <footer className="public-footer">
           <a href="/" className="public-footer-brand">
-            <Zap size={16} fill="currentColor" /> FixFlow AI
+            <Zap size={16} fill="currentColor" /> FixFlow 
           </a>
 
           <span>

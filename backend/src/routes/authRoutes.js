@@ -8,9 +8,9 @@ const router = express.Router();
 
 // Automatically use the correct frontend URL in development and production.
 const FRONTEND_URL =
-  process.env.FRONTEND_URL ||
-  process.env.RENDER_EXTERNAL_URL ||
-  "http://localhost:5173";
+  process.env.NODE_ENV === "production"
+    ? (process.env.RENDER_EXTERNAL_URL || "https://fixora-lzci.onrender.com")
+    : "http://localhost:5173";
 
 const DASHBOARD_ROUTES = {
   resident: "/resident",

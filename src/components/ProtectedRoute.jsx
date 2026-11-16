@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
-const API_URL = "http://localhost:5000";
+const API_BASE_URL = "";
 
 export default function ProtectedRoute({ allowedRole, children }) {
   const [user, setUser] = useState(null);

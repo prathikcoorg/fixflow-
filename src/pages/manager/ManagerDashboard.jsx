@@ -711,7 +711,7 @@ function ManagerDashboard() {
               <Zap size={17} />
             </div>
 
-            <strong>FixFlow AI</strong>
+            <strong>FixFlow </strong>
             <p>Keep your community running smoothly.</p>
             <a href="/work-status">View public board ↗</a>
           </div>

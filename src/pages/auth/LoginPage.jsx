@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import "./LoginPage.css";
 
-const API_URL = "http://localhost:5000";
+const API_BASE_URL = "";
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();

@@ -93,7 +93,7 @@ export default function StaffLoginPage() {
             <div className="staff-brand-icon">
               <Icon size={25} />
             </div>
-            <span>FixFlow AI</span>
+            <span>FixFlow </span>
           </div>
 
           <div className="staff-login-heading">

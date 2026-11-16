@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { CheckCircle2, Clock3, MapPin } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "";
 
 function formatCompletionDate(date) {
   if (!date) return "Completion date unavailable";
