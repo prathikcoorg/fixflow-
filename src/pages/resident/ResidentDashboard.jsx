@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "";
 const API_URL = `${API_BASE_URL}/api/maintenance-requests`;
 const AUTH_URL = `${API_BASE_URL}/api/auth`;
 const NOTIFICATIONS_URL = `${API_BASE_URL}/api/notifications`;

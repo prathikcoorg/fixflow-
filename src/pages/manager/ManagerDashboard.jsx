@@ -29,7 +29,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "";
 const API_URL = `${API_BASE_URL}/api/maintenance-requests`;
 const AUTH_ME_URL = `${API_BASE_URL}/api/auth/me`;
 const LOGOUT_URL = `${API_BASE_URL}/api/auth/logout`;
