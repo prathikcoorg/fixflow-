@@ -1,12 +1,14 @@
+
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
-const API_BASE_URL = "";
+const API_URL = "/api/auth/me";
 
 export default function ProtectedRoute({ allowedRole, children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
   const location = useLocation();
 
   useEffect(() => {
@@ -14,13 +16,18 @@ export default function ProtectedRoute({ allowedRole, children }) {
 
     async function checkAuth() {
       try {
-        const response = await fetch(`${API_URL}/api/auth/me`, {
+        setLoading(true);
+        setError(false);
+
+        const response = await fetch(API_URL, {
           method: "GET",
           credentials: "include",
         });
 
         if (!response.ok) {
-          if (!cancelled) setUser(null);
+          if (!cancelled) {
+            setUser(null);
+          }
           return;
         }
 
@@ -30,9 +37,15 @@ export default function ProtectedRoute({ allowedRole, children }) {
           setUser(data.user ?? null);
         }
       } catch (err) {
-        if (!cancelled) setError(true);
+        console.error("Authentication check failed:", err);
+
+        if (!cancelled) {
+          setError(true);
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
@@ -44,12 +57,16 @@ export default function ProtectedRoute({ allowedRole, children }) {
   }, [location.pathname]);
 
   if (loading) {
-    return <div className="auth-loading">Checking login...</div>;
+    return (
+      <div className="auth-loading">
+        Checking login...
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="auth-loading">
+      <div className="auth-loading" role="alert">
         Cannot connect to the server. Make sure the backend is running.
       </div>
     );
@@ -60,10 +77,16 @@ export default function ProtectedRoute({ allowedRole, children }) {
       allowedRole === "manager"
         ? "/manager/login"
         : allowedRole === "technician"
-        ? "/technician/login"
-        : "/login";
+          ? "/technician/login"
+          : "/login";
 
-    return <Navigate to={loginPath} replace state={{ from: location }} />;
+    return (
+      <Navigate
+        to={loginPath}
+        replace
+        state={{ from: location }}
+      />
+    );
   }
 
   if (user.role !== allowedRole) {

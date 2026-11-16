@@ -15,9 +15,9 @@ export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const error = searchParams.get("error");
 
-  function handleGoogleLogin() {
-    window.location.href = `${API_URL}/api/auth/google`;
-  }
+ function handleGoogleLogin() {
+  window.location.href = `${API_BASE_URL}/api/auth/google`;
+}
 
   const errorMessages = {
     google_auth_failed: "Google sign-in failed. Please try again.",
