@@ -7,7 +7,13 @@ const API_BASE_URL = "";
 function formatCompletionDate(date) {
   if (!date) return "Completion date unavailable";
 
-  return new Date(date).toLocaleString("en-IN", {
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Completion date unavailable";
+  }
+
+  return parsedDate.toLocaleString("en-IN", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -26,9 +32,18 @@ export default function RecentlyCompleted() {
 
     async function fetchCompletedRequests() {
       try {
+        setLoading(true);
+        setError("");
+
         const response = await fetch(
           `${API_BASE_URL}/api/maintenance-requests/completed/recent`,
-          { credentials: "include" }
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              Accept: "application/json",
+            },
+          }
         );
 
         const result = await response.json();
@@ -40,7 +55,7 @@ export default function RecentlyCompleted() {
         }
 
         if (!cancelled) {
-          setRequests(result.data || []);
+          setRequests(Array.isArray(result.data) ? result.data : []);
         }
       } catch (err) {
         if (!cancelled) {
@@ -66,7 +81,9 @@ export default function RecentlyCompleted() {
         <div>
           <p className="recently-completed-eyebrow">WORK HISTORY</p>
           <h2>Recently Completed</h2>
-          <p>Maintenance requests resolved by your community team.</p>
+          <p>
+            Maintenance requests resolved by your community team.
+          </p>
         </div>
 
         <CheckCircle2 size={24} />
@@ -88,7 +105,9 @@ export default function RecentlyCompleted() {
         <div className="recently-completed-empty">
           <CheckCircle2 size={28} />
           <p>No completed requests yet.</p>
-          <span>Resolved maintenance work will appear here.</span>
+          <span>
+            Resolved maintenance work will appear here.
+          </span>
         </div>
       )}
 

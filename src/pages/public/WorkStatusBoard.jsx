@@ -1,3 +1,4 @@
+
 import "./WorkStatusBoard.css";
 import { useState, useEffect, useCallback } from "react";
 import {
@@ -18,8 +19,7 @@ import {
 
 const API_URL = "";
 
-// Configure this in frontend/.env:
-// VITE_PUBLIC_ORGANIZATION_ID=1
+// Set VITE_PUBLIC_ORGANIZATION_ID=1 in your frontend environment.
 const ORGANIZATION_ID = import.meta.env.VITE_PUBLIC_ORGANIZATION_ID;
 
 function formatDate(value) {
@@ -90,7 +90,11 @@ function mapRequest(request) {
     request.assigned_technician_id || request.technician_name
   );
 
-  const isInProgress = ["in_progress", "resolved", "closed"].includes(status);
+  const isInProgress = [
+    "in_progress",
+    "resolved",
+    "closed",
+  ].includes(status);
 
   const isResolved = ["resolved", "closed"].includes(status);
 
@@ -102,7 +106,9 @@ function mapRequest(request) {
   const updates = [
     {
       status: "Request received",
-      date: receivedAt ? formatDate(receivedAt) : "Date unavailable",
+      date: receivedAt
+        ? formatDate(receivedAt)
+        : "Date unavailable",
       done: true,
     },
     {
@@ -157,11 +163,10 @@ function WorkStatusBoard() {
 
   const filters = ["All work", "Open", "In progress", "Resolved"];
 
-  // Fetch published requests from the backend.
   const fetchWorkItems = useCallback(async (showLoader = false) => {
     if (!ORGANIZATION_ID) {
       setError(
-        "Public board organization is not configured. Add VITE_PUBLIC_ORGANIZATION_ID=1 to your frontend .env file."
+        "Public board organization is not configured. Set VITE_PUBLIC_ORGANIZATION_ID=1 in your frontend environment and redeploy."
       );
       setLoading(false);
       return;
@@ -173,7 +178,7 @@ function WorkStatusBoard() {
 
     try {
       const response = await fetch(
-        `${API_URL}/public?organization_id=${encodeURIComponent(
+        `${API_URL}/api/maintenance-requests/public?organization_id=${encodeURIComponent(
           ORGANIZATION_ID
         )}`
       );
@@ -182,7 +187,7 @@ function WorkStatusBoard() {
 
       if (!response.ok || !result.success) {
         throw new Error(
-          result.message || "Unable to load community work updates."
+          result.message || `Unable to load updates. HTTP ${response.status}`
         );
       }
 
@@ -192,7 +197,6 @@ function WorkStatusBoard() {
 
       setWorkItems(items);
 
-      // Refresh the currently open tracking modal as well.
       setSelected((current) => {
         if (!current) return null;
 
@@ -216,7 +220,6 @@ function WorkStatusBoard() {
     }
   }, []);
 
-  // Initial fetch and automatic refresh.
   useEffect(() => {
     fetchWorkItems(true);
 
@@ -227,7 +230,6 @@ function WorkStatusBoard() {
     return () => clearInterval(interval);
   }, [fetchWorkItems]);
 
-  // Search and status filters.
   const visibleItems = workItems.filter((item) => {
     const matchesFilter =
       filter === "All work" || item.status === filter;
@@ -244,7 +246,6 @@ function WorkStatusBoard() {
     return matchesFilter && matchesSearch;
   });
 
-  // Dashboard counts.
   const resolvedCount = workItems.filter(
     (item) => item.status === "Resolved" || item.status === "Closed"
   ).length;
@@ -525,7 +526,7 @@ function WorkStatusBoard() {
 
         <footer className="public-footer">
           <a href="/" className="public-footer-brand">
-            <Zap size={16} fill="currentColor" /> FixFlow 
+            <Zap size={16} fill="currentColor" /> FixFlow
           </a>
 
           <span>
