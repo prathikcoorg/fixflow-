@@ -20,7 +20,8 @@ import {
 const API_URL = "";
 
 // Set VITE_PUBLIC_ORGANIZATION_ID=1 in your frontend environment.
-const ORGANIZATION_ID = import.meta.env.VITE_PUBLIC_ORGANIZATION_ID;
+const ORGANIZATION_ID =
+  import.meta.env.VITE_PUBLIC_ORGANIZATION_ID || "1";
 
 function formatDate(value) {
   if (!value) return "Pending";
